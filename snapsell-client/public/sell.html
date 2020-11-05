@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Snapsell</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <style>
+      .cards {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-gap: 1rem;
+      }
+      @media (min-width: 600px) {
+        .cards {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      #imagelisting {
+        position: relative;
+        height: 250px;
+        width: 100%;
+        overflow: hidden;
+      }
+      .img-resize {
+        object-fit: cover;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <nav class="nav">
+        <a class="nav-link" href="/profile">Profile</a>
+        <a class="nav-link" href="/items/">Buy Items</a>
+        <a class="nav-link" href="/search/">Search</a>
+        <a class="nav-link" href="/sell/">Sell</a>
+        <a class="nav-link" onclick="logout()">Log Out</a>
+      </nav>
+
+      <div style="margin-top: 2rem;">
+        <h1>Sell an Item</h1>
+        <form id="sell-form" style="margin-top: 2rem;" class="text-center">
+          <div class="form-group">
+            <p class="text-left">Title:</p>
+            <textarea
+              class="form-control"
+              id="title"
+              rows="1"
+              placeholder="Enter Title"
+            ></textarea>
+            <p class="pt-3 text-left">Description:</p>
+            <textarea
+              class="form-control"
+              id="description"
+              rows="3"
+              placeholder="Enter Description"
+            ></textarea>
+            <p class="pt-3 text-left">Price:</p>
+            <textarea
+              class="form-control"
+              id="price"
+              rows="1"
+              placeholder="Enter Price"
+            ></textarea>
+            <p class="pt-3 text-left">Image:</p>
+            <textarea
+              class="form-control"
+              id="image"
+              rows="1"
+              placeholder="Enter Image URL"
+            ></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Sell !</button>
+        </form>
+      </div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+      const baseUrl = "http://localhost:3000";
+      const token = localStorage.getItem("token");
+      const loggedInUserID = parseInt(localStorage.getItem("loggedInUserID"));
+
+      if (token === null || isNaN(loggedInUserID)) {
+        window.location.href = "/login/";
+      } else {
+        const baseUrl = "http://localhost:3000";
+        //---------------------------------------------------------
+        //  Add A Listing
+        //---------------------------------------------------------
+        $("#sell-form").submit(event => {
+          event.preventDefault();
+          const title = $("#title").val();
+          const description = $("#description").val();
+          const price = $("#price").val();
+          const fk_poster_id = loggedInUserID;
+          const image = $("#image").val();
+          const requestBody = {
+            title: title,
+            description: description,
+            price: price,
+            fk_poster_id: fk_poster_id,
+            image: image
+          };
+          axios.post(`${baseUrl}/listings/`, requestBody).then(response => {
+            alert(
+              "Success! You may view your item and the offers on your profile"
+            );
+            $("#sell-form").html("");
+          });
+        });
+
+        function logout() {
+          localStorage.removeItem("token");
+          sessionStorage.removeItem("token");
+          window.location.href = "/login/";
+        }
+      }
+    </script>
+  </body>
+</html>

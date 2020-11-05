@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Snapsell</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <style>
+      .cards {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-gap: 1rem;
+      }
+      @media (min-width: 600px) {
+        .cards {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      #imagelisting {
+        position: relative;
+        height: 250px;
+        width: 100%;
+        overflow: hidden;
+      }
+      .img-resize {
+        object-fit: cover;
+      }
+      h4 {
+        padding-top: 20px;
+      }
+      #offer-form{
+          padding-top: 60px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <nav class="nav">
+        <a class="nav-link" href="/profile">Profile</a>
+        <a class="nav-link" href="/items/">Buy Items</a>
+        <a class="nav-link" href="/search/">Search</a>
+        <a class="nav-link" href="/sell/">Sell</a>
+        <a class="nav-link" onclick="logout()">Log Out</a>
+      </nav>
+
+      <div class="row" style="margin-top: 2rem;">
+        <div class="col-md-8 col-xs-12">              
+            <h4>Offer</h4>
+
+            <div id="listings" class="cards"></div>
+        </div>
+        <div class="col-md-4 col-xs-12">
+            <form id="offer-form" style="margin-top: 2rem;" class="text-center">
+                <div class="form-group">
+                  <p class="pt-3 text-left">Price:</p>
+                  <textarea
+                    class="form-control"
+                    id="price"
+                    rows="1"
+                    placeholder="Enter Price"
+                  ></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Offer !</button>
+              </form>
+        </div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+      const baseUrl = "http://localhost:3000";
+      const token = localStorage.getItem("token");
+      const loggedInUserID = parseInt(localStorage.getItem("loggedInUserID"));
+
+      if (token === null || isNaN(loggedInUserID)) {
+        window.location.href = "/login/";
+      } else {
+        // API url
+        const baseUrl = "http://localhost:3000";
+        const loggedInUserID = localStorage.getItem("loggedInUserID");
+        const itemID = parseInt(localStorage.getItem("itemID"));
+
+      //------------------------------------------------------
+      //  Get Listing by ID
+      //------------------------------------------------------
+        axios
+          .get(`${baseUrl}/listings/${itemID}`)
+          .then(response => {
+            const listing = response.data;
+            console.log(response.data)
+              const listingHtml = `
+                <div class="card" style="margin-top: 2rem;">
+                  
+                    <div class="card-body">
+                        <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;  width: 200px; ">${listing.title}</p>
+                        <div id="imagelisting">
+                          <img src="${listing.image}"  width="100%" height="230" class="img-resize"/>
+                        </div>
+                        <p>S$${listing.price}</p>
+                        <p>${listing.description}</p>
+                    </div>
+                  
+                    <div class="card-footer text-muted">
+                        ${listing.created_at}
+                    </div>
+                </div>
+              
+                `;
+              $("#listings").append(listingHtml);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+
+          $("#offer-form").submit(event => {
+              event.preventDefault();
+              const offer = $("#price").val();
+              const fk_offeror_id = loggedInUserID;
+              const fk_listing_id = itemID
+              const requestBody = {
+                  offer:offer,
+                  fk_offeror_id:fk_offeror_id
+              };
+              axios.post(`${baseUrl}/listings/${fk_listing_id}/offers`, requestBody).then(response => {
+                  alert(
+                      "You have offered the item!"
+                  );
+                  window.location.href="/items/"
+              })
+          })
+
+    //------------------------------------------------------
+    //  Log Out
+    //------------------------------------------------------
+      function logout() {
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        window.location.href = "/login/";
+      }
+      }
+
+    </script>
+  </body>
+</html>

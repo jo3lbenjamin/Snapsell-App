@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Snapsell</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <style>
+      .sign-up {
+        padding-top: 20px;
+        position: relative;
+      }
+      .login-form {
+        width: 340px;
+        margin: 50px auto;
+      }
+      .login-form form {
+        margin-bottom: 15px;
+        background: #f7f7f7;
+        box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+        padding: 30px;
+      }
+      .login-form h2 {
+        margin: 0 0 15px;
+      }
+      .form-control,
+      .btn {
+        min-height: 38px;
+        border-radius: 2px;
+      }
+      .btn {
+        font-size: 15px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-form">
+      <h2 class="text-center">Welcome to Snapsell</h2>
+
+      <form id="login-form">
+        <h1 class="text-center">Login</h1>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            class="form-control"
+            id="username"
+            required="required"
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            required="required"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+    </br>
+        <a href="/register/" class="text-center sign-up">Not yet with Snapsell? Sign up</a>
+      </form>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+      const baseUrl = "http://localhost:3000";
+      $("#login-form").submit(event => {
+        // prevent page reload
+        event.preventDefault();
+
+        const username = $("#username").val();
+        const password = $("#password").val();
+        const requestBody = {
+          username: username,
+          password: password
+        };
+
+        axios
+          .post(`${baseUrl}/login/`, requestBody)
+          .then(response => {
+            const token = response.data.token;
+            const loggedInUserID = response.data.user_id;
+            localStorage.setItem("token", token);
+            localStorage.setItem("loggedInUserID", loggedInUserID);
+            window.location.href = "/profile";
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      });
+    </script>
+  </body>
+</html>
